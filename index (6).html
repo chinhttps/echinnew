@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Veyro — Smart finds, everyday essentials.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EFEEE6;
+    --paper-alt: #E4E1D3;
+    --ink: #17170F;
+    --ink-soft: #55534A;
+    --rust: #B8451E;
+    --gold: #C99A2E;
+    --line: #D3CFBE;
+    --card-bg: #F7F6F0;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .mono{ font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.06em; }
+  a{ color: inherit; }
+  button{ font-family: inherit; }
+
+  /* ---------- NAV / HEADER ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 22px 6vw;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 20;
+  }
+
+  .brand-row{ display:flex; align-items:center; gap: 12px; }
+
+  .wordmark{
+    font-family:'Archivo', sans-serif;
+    font-weight:900;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+  }
+  .wordmark span{ color: var(--rust); }
+
+  .by{
+    font-size: 0.65rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    padding-left: 10px;
+    border-left: 1px solid var(--line);
+  }
+
+  .spin3d-wrap{ perspective: 300px; width: 22px; height: 22px; flex-shrink:0; }
+  .spin3d{
+    width: 100%; height:100%;
+    transform-style: preserve-3d;
+    animation: spin3d 5s linear infinite;
+  }
+  .spin3d svg{ width:100%; height:100%; }
+  @keyframes spin3d{
+    0%{ transform: rotateY(0deg) rotateX(8deg); }
+    100%{ transform: rotateY(360deg) rotateX(8deg); }
+  }
+  @media (prefers-reduced-motion: reduce){ .spin3d{ animation:none; } }
+
+  nav{ display:flex; align-items:center; gap: 18px; }
+  nav .mono{ font-size: 0.72rem; color: var(--ink-soft); text-transform: uppercase; }
+
+  .cart-btn{
+    position: relative;
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 9px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .cart-btn:hover{ background: var(--rust); }
+  .cart-btn:active{ transform: translateY(1px); }
+  .cart-btn svg{ width:16px; height:16px; }
+  .cart-badge{
+    position:absolute;
+    top:-6px; right:-6px;
+    background: var(--rust);
+    color: var(--paper);
+    font-size: 0.62rem;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 0 4px;
+    border: 2px solid var(--paper);
+  }
+
+  /* ---------- ADMIN BAR ---------- */
+  .admin-bar{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 6vw;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+  }
+  .admin-bar .admin-btn{ color: var(--paper); border-color: rgba(239,238,230,0.35); }
+  .admin-bar .admin-btn:hover{ border-color: var(--rust); color: var(--rust); }
+  body.admin-active .admin-bar{ display:flex; }
+
+  .admin-btn{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .admin-btn:hover{ border-color: var(--rust); color: var(--rust); }
+
+  /* ---------- HERO ---------- */
+  .hero{ position: relative; padding: 7vh 6vw 10vh; max-width: 1100px; perspective: 900px; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:10px;
+    font-size: 0.72rem; color: var(--ink-soft); text-transform: uppercase;
+    border: 1px solid var(--line); padding: 6px 12px 6px 8px; border-radius: 999px; margin-bottom: 2.2rem;
+  }
+  .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background: var(--rust); display:inline-block; }
+
+  h1{
+    font-family: 'Archivo', sans-serif; font-weight: 900;
+    font-size: clamp(2.4rem, 6vw, 5rem); line-height: 0.98; letter-spacing: -0.02em; max-width: 14ch;
+  }
+  h1 em{ font-style: normal; color: var(--rust); }
+
+  .hero-sub{ margin-top: 1.8rem; max-width: 46ch; font-size: 1.05rem; line-height: 1.55; color: var(--ink-soft); }
+
+  .hero-actions{ margin-top: 2.2rem; display:flex; align-items:center; gap: 1.6rem; flex-wrap: wrap; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap: 10px;
+    background: var(--ink); color: var(--paper); padding: 14px 22px; border-radius: 4px;
+    text-decoration: none; font-weight: 500; font-size: 0.95rem;
+    transition: transform 0.15s ease, background 0.15s ease; border:none; cursor:pointer;
+  }
+  .btn:hover{ background: var(--rust); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(1px); }
+
+  .btn-secondary{ font-size: 0.85rem; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 4px; background:none; border:none; cursor:pointer; }
+
+  .hero-tag{
+    position: absolute; top: 3vh; right: 7vw; width: 156px;
+    transform-style: preserve-3d; animation: tagFloat3D 6s ease-in-out infinite;
+  }
+  @keyframes tagFloat3D{
+    0%, 100%{ transform: rotate(9deg) rotateY(0deg) translateY(0); }
+    50%{ transform: rotate(9deg) rotateY(22deg) translateY(-8px); }
+  }
+  .hero-tag svg{ width:100%; height:auto; display:block; }
+  @media (max-width: 860px){ .hero-tag{ display:none; } }
+  @media (prefers-reduced-motion: reduce){ .hero-tag{ animation: none; } }
+
+  /* ---------- SECTION HEAD ---------- */
+  .section-head{
+    padding: 0 6vw; display:flex; align-items:baseline; justify-content:space-between;
+    gap: 2rem; flex-wrap: wrap; margin-bottom: 2.6rem;
+  }
+  .section-head h2{
+    font-family:'Archivo', sans-serif; font-weight: 700; font-size: clamp(1.5rem, 3vw, 2.1rem); letter-spacing: -0.01em;
+  }
+  .section-head p{ color: var(--ink-soft); max-width: 34ch; font-size: 0.94rem; line-height: 1.5; }
+
+  /* ---------- FEATURES / TAGS ---------- */
+  .features{ padding: 9vh 6vw 10vh; border-top: 1px solid var(--line); }
+
+  .tag-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px; padding: 0 6vw; perspective: 1400px;
+  }
+  @media (max-width: 920px){ .tag-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px){ .tag-grid{ grid-template-columns: 1fr; } }
+
+  .tag-card{
+    position: relative; background: var(--card-bg); border: 1px solid var(--line); border-radius: 6px;
+    padding: 28px 22px 24px; height: 100%; cursor: pointer;
+    transform-style: preserve-3d; will-change: transform; box-shadow: 0 1px 0 var(--line);
+    transition: transform 0.15s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .tag-card:hover{ box-shadow: 0 18px 34px -20px rgba(23,23,15,0.4); border-color: var(--rust); }
+  .tag-card:focus-visible{ outline: 2px solid var(--rust); outline-offset: 3px; }
+
+  .tag-hole{ position: absolute; top: 16px; left: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 1.5px solid var(--ink-soft); }
+  .tag-code{ display:block; text-align:right; font-size: 0.66rem; color: var(--gold); margin-bottom: 20px; }
+  .tag-icon{ width: 28px; height:28px; margin-bottom: 16px; color: var(--ink); }
+  .tag-icon svg{ width:100%; height:100%; }
+  .tag-card h3{ font-family:'Archivo', sans-serif; font-weight: 700; font-size: 1.04rem; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .tag-card p{ font-size: 0.88rem; line-height: 1.5; color: var(--ink-soft); }
+  .tag-open{ display:block; margin-top: 14px; font-size: 0.62rem; color: var(--rust); text-transform: uppercase; }
+
+  /* ---------- MERCH ---------- */
+  .merch{ padding: 9vh 6vw 10vh; border-top: 1px solid var(--line); background: var(--paper-alt); }
+  .merch-category{ margin-bottom: 52px; }
+  .merch-category:last-child{ margin-bottom: 0; }
+  .category-head{ display:flex; align-items:baseline; gap:12px; margin: 0 6vw 18px; }
+  .category-head h3{ font-family:'Archivo', sans-serif; font-weight:700; font-size:1.05rem; }
+  .category-head span{ font-size: 0.66rem; color: var(--ink-soft); text-transform: uppercase; }
+
+  .merch-grid{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 0 6vw; perspective: 1400px;
+  }
+
+  .product-card{
+    position: relative; background: var(--card-bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 16px 18px; display:flex; flex-direction: column;
+    transform-style: preserve-3d; will-change: transform;
+    transition: transform 0.15s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .product-card:hover{ box-shadow: 0 16px 32px -20px rgba(23,23,15,0.4); border-color: var(--rust); }
+
+  .product-badge{
+    position:absolute; top: 12px; right: 12px; font-size: 0.6rem; color: var(--rust);
+    border: 1px solid var(--rust); border-radius: 999px; padding: 3px 8px; text-transform: uppercase;
+    background: var(--card-bg); z-index: 2;
+  }
+
+  .product-image{
+    width: 100%; height: 148px; display:flex; align-items:center; justify-content:center;
+    margin-bottom: 12px; border-radius: 6px; background: linear-gradient(180deg, #fff, var(--paper) 88%);
+    cursor: pointer; overflow: hidden;
+  }
+  .product-image svg{ width: 128px; height: 128px; }
+
+  .product-info{ display:flex; align-items:baseline; justify-content:space-between; gap: 8px; margin-bottom: 4px; }
+  .product-info h3{ font-family:'Archivo', sans-serif; font-weight: 700; font-size: 0.96rem; letter-spacing: -0.01em; cursor:pointer; }
+  .product-price{ font-size: 0.84rem; color: var(--rust); white-space: nowrap; }
+
+  .colorway{ display:flex; align-items:center; font-size: 0.72rem; color: var(--ink-soft); margin-bottom: 6px; }
+  .swatch{ width:11px; height:11px; border-radius:50%; display:inline-block; margin-right:6px; border:1px solid var(--line); vertical-align:middle; flex-shrink:0; }
+
+  .product-rating{ font-size: 0.7rem; color: var(--gold); margin-bottom: 8px; }
+  .product-rating .count{ color: var(--ink-soft); }
+
+  .product-card p.product-desc{ font-size: 0.8rem; line-height: 1.45; color: var(--ink-soft); margin-bottom: 10px; }
+
+  .product-stock{ font-size: 0.6rem; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+
+  .qty-stepper{ display:flex; align-items:center; gap:0; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 4px; width: fit-content; }
+  .qty-btn{ background:none; border:none; width: 26px; height: 26px; font-size: 0.9rem; color: var(--ink); cursor:pointer; }
+  .qty-btn:hover{ color: var(--rust); }
+  .qty-val{ width: 26px; text-align:center; font-size: 0.8rem; font-family:'IBM Plex Mono', monospace; }
+
+  .product-actions{ display:flex; flex-direction: column; gap: 8px; margin-top: auto; }
+  .product-actions-row{ display:flex; gap: 8px; }
+
+  .btn-cart{
+    flex:1; background: transparent; border: 1px solid var(--ink); color: var(--ink);
+    font-size: 0.78rem; padding: 9px 10px; border-radius: 4px; cursor:pointer;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  }
+  .btn-cart:hover{ background: var(--ink); color: var(--paper); }
+  .btn-cart:active{ transform: translateY(1px); }
+
+  .btn-buy{
+    flex:1; background: var(--rust); border: 1px solid var(--rust); color: var(--paper);
+    font-size: 0.78rem; padding: 9px 10px; border-radius: 4px; cursor:pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .btn-buy:hover{ background: #9c3a19; }
+  .btn-buy:active{ transform: translateY(1px); }
+
+  .btn-details{
+    width:100%; background: none; border: 1px dashed var(--line); color: var(--ink-soft);
+    font-size: 0.74rem; padding: 8px 10px; border-radius: 4px; cursor:pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-details:hover{ border-color: var(--rust); color: var(--rust); }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top: 1px solid var(--line); padding: 36px 6vw; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap: wrap; gap: 14px;
+  }
+  footer .wordmark{ font-size: 1rem; }
+  footer .mono{ font-size: 0.66rem; color: var(--ink-soft); }
+  footer .brand-row{ gap: 10px; }
+
+  /* ---------- SITE GATE ---------- */
+  .gate-overlay{
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(184,69,30,0.10), transparent 45%), var(--paper);
+    display:flex; align-items:center; justify-content:center; padding: 20px; z-index: 500;
+  }
+  .gate-overlay.gate-hidden{ display:none; }
+  body.gate-open{ overflow: hidden; }
+  .gate-box{ max-width: 360px; }
+  .gate-wordmark{ text-align:center; font-size: 1.6rem; margin-bottom: 10px; }
+  .gate-box .modal-sub{ text-align:center; }
+  .gate-tabs{ display:flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; margin-bottom: 20px; }
+  .gate-tab{
+    flex:1; background: transparent; border: none; padding: 9px 0; border-radius: 999px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; color: var(--ink-soft); cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .gate-tab.active{ background: var(--ink); color: var(--paper); }
+
+  /* ---------- MODAL (shared) ---------- */
+  .modal-overlay{
+    position: fixed; inset: 0; background: rgba(23,23,15,0.55); display:none;
+    align-items:center; justify-content:center; padding: 20px; z-index: 100; overflow-y:auto;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{
+    position: relative; width: 100%; max-width: 340px; background: var(--card-bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 30px 26px; max-height: 88vh; overflow-y:auto;
+  }
+  .modal-box h3{ font-family:'Archivo', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 6px; }
+  .modal-sub{ font-size: 0.8rem; color: var(--ink-soft); margin-bottom: 20px; line-height: 1.5; }
+  .modal-close{
+    position: absolute; top: 14px; right: 16px; background:none; border:none; font-size: 1.3rem;
+    line-height: 1; cursor: pointer; color: var(--ink-soft);
+  }
+  .modal-field{ margin-bottom: 14px; }
+  .modal-field label{ display:block; font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 6px; }
+  .modal-field input, .modal-field select{
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px;
+    background: var(--paper); color: var(--ink); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem;
+  }
+  .modal-field input:focus, .modal-field select:focus{ outline:none; border-color: var(--rust); }
+  .modal-row{ display:flex; gap: 10px; }
+  .modal-row .modal-field{ flex:1; }
+  .modal-error{ font-size: 0.74rem; color: var(--rust); min-height: 1.1em; margin-bottom: 8px; }
+  .modal-submit{
+    width: 100%; background: var(--ink); color: var(--paper); border: none; padding: 12px; border-radius: 4px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 0.86rem; cursor: pointer; transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .modal-submit:hover{ background: var(--rust); }
+  .modal-submit:active{ transform: translateY(1px); }
+  .modal-submit.ghost{ background: transparent; border: 1px solid var(--line); color: var(--ink-soft); margin-top:8px; }
+  .modal-submit.ghost:hover{ background:none; border-color:var(--rust); color:var(--rust); }
+  .modal-note{ margin-top: 12px; font-size: 0.64rem; color: var(--ink-soft); line-height: 1.5; }
+
+  @keyframes shake{
+    10%,90%{ transform: translateX(-1px); } 20%,80%{ transform: translateX(2px); }
+    30%,50%,70%{ transform: translateX(-4px); } 40%,60%{ transform: translateX(4px); }
+  }
+  .shake{ animation: shake 0.4s; }
+
+  /* ---------- TAG DETAIL MODAL ---------- */
+  .tag-modal-box{ max-width: 420px; }
+  .tag-modal-code{ display:inline-block; font-size: 0.64rem; color: var(--rust); border: 1px solid var(--rust); border-radius: 999px; padding: 3px 10px; margin-bottom: 12px; }
+  .tag-modal-desc{ font-size: 0.88rem; line-height: 1.6; color: var(--ink-soft); margin-bottom: 18px; }
+  .tag-modal-label{ font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin-bottom: 10px; }
+  .tag-option-list{ display:flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .tag-option{
+    display:flex; align-items:center; gap: 12px; text-align: left; background: var(--paper);
+    border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; font-size: 0.84rem;
+    color: var(--ink); cursor: pointer; transition: border-color 0.15s ease, transform 0.1s ease;
+  }
+  .tag-option:hover{ border-color: var(--rust); }
+  .tag-option .dot-ring{ width: 14px; height:14px; border-radius: 50%; border: 1.5px solid var(--ink-soft); flex-shrink: 0; position: relative; }
+  .tag-option.selected{ border-color: var(--rust); background: var(--card-bg); transform: translateX(2px); }
+  .tag-option.selected .dot-ring{ border-color: var(--rust); }
+  .tag-option.selected .dot-ring::after{ content:''; position:absolute; inset: 2.5px; border-radius: 50%; background: var(--rust); }
+
+  /* ---------- CART DRAWER ---------- */
+  .cart-overlay{
+    position: fixed; inset:0; background: rgba(23,23,15,0.5); display:none; z-index: 300;
+  }
+  .cart-overlay.open{ display:block; }
+  .cart-drawer{
+    position: fixed; top:0; right:0; bottom:0; width: min(380px, 92vw); background: var(--card-bg);
+    border-left: 1px solid var(--line); display:flex; flex-direction:column; transform: translateX(100%);
+    transition: transform 0.28s ease; z-index: 301;
+  }
+  .cart-overlay.open .cart-drawer{ transform: translateX(0); }
+  .cart-head{ display:flex; align-items:center; justify-content:space-between; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+  .cart-head h3{ font-family:'Archivo', sans-serif; font-size: 1.05rem; font-weight:700; }
+  .cart-items{ flex:1; overflow-y:auto; padding: 14px 22px; }
+  .cart-empty{ font-size: 0.85rem; color: var(--ink-soft); padding: 30px 0; text-align:center; }
+  .cart-item{ display:flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .cart-item-img{ width: 52px; height:52px; flex-shrink:0; background: var(--paper); border-radius:6px; display:flex; align-items:center; justify-content:center; }
+  .cart-item-img svg{ width:40px; height:40px; }
+  .cart-item-info{ flex:1; }
+  .cart-item-info h4{ font-family:'Archivo', sans-serif; font-size: 0.86rem; font-weight:700; margin-bottom: 2px; }
+  .cart-item-info .colorway{ margin-bottom: 4px; }
+  .cart-item-controls{ display:flex; align-items:center; justify-content:space-between; }
+  .cart-item-remove{ background:none; border:none; color: var(--ink-soft); font-size: 0.68rem; text-decoration:underline; cursor:pointer; }
+  .cart-item-remove:hover{ color: var(--rust); }
+  .cart-item-price{ font-size: 0.8rem; color: var(--rust); white-space:nowrap; }
+  .cart-foot{ padding: 18px 22px 22px; border-top: 1px solid var(--line); }
+  .cart-subtotal{ display:flex; justify-content:space-between; font-size: 0.9rem; margin-bottom: 14px; }
+  .cart-subtotal strong{ font-family:'Archivo', sans-serif; }
+
+  /* ---------- CHECKOUT ---------- */
+  .checkout-box{ max-width: 420px; }
+  .checkout-steps{ display:flex; gap: 6px; margin-bottom: 20px; }
+  .checkout-steps span{ flex:1; height: 3px; background: var(--line); border-radius: 2px; }
+  .checkout-steps span.active{ background: var(--rust); }
+
+  .pay-option{
+    display:flex; align-items:center; gap: 12px; border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px 14px; margin-bottom: 10px; cursor:pointer; transition: border-color 0.15s ease;
+  }
+  .pay-option:hover{ border-color: var(--rust); }
+  .pay-option.selected{ border-color: var(--rust); background: var(--paper); }
+  .pay-option .dot-ring{ width: 14px; height:14px; border-radius: 50%; border: 1.5px solid var(--ink-soft); flex-shrink: 0; position: relative; }
+  .pay-option.selected .dot-ring{ border-color: var(--rust); }
+  .pay-option.selected .dot-ring::after{ content:''; position:absolute; inset: 2.5px; border-radius: 50%; background: var(--rust); }
+  .pay-option .pay-label{ font-size: 0.86rem; }
+  .pay-option .pay-sub{ font-size: 0.68rem; color: var(--ink-soft); display:block; }
+  .pay-fields{ display:none; margin: -2px 0 14px 26px; }
+  .pay-fields.active{ display:block; }
+
+  .order-summary{ background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-bottom: 16px; font-size: 0.82rem; }
+  .order-summary-row{ display:flex; justify-content:space-between; padding: 4px 0; color: var(--ink-soft); }
+  .order-summary-row.total{ color: var(--ink); font-weight:700; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; }
+
+  .confirm-icon{ width: 52px; height:52px; margin: 0 auto 16px; color: var(--rust); }
+  .confirm-box{ text-align:center; }
+  .confirm-order-no{ font-family:'IBM Plex Mono', monospace; font-size: 0.9rem; color: var(--rust); margin-bottom: 18px; }
+
+  /* ---------- DETAIL MODAL ---------- */
+  .detail-box{ max-width: 420px; }
+  .detail-image{
+    width:100%; height: 200px; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(180deg, #fff, var(--paper) 88%); border-radius: 6px; margin-bottom: 16px;
+  }
+  .detail-image svg{ width: 170px; height:170px; }
+  .detail-swatches{ display:flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .detail-swatch{ width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor:pointer; padding:0; }
+  .detail-swatch.active{ border-color: var(--rust); }
+  .detail-size-table{ width:100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.78rem; }
+  .detail-size-table th, .detail-size-table td{ border: 1px solid var(--line); padding: 6px 8px; text-align:center; }
+  .detail-size-table th{ background: var(--paper); font-weight:500; color: var(--ink-soft); }
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+    background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: 6px; font-size: 0.84rem;
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 600; max-width: 88vw; text-align: center;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body class="gate-open">
+
+<div class="gate-overlay" id="gateOverlay">
+  <div class="modal-box gate-box">
+    <div class="wordmark gate-wordmark">Vey<span>ro</span></div>
+    <p class="modal-sub">Sign in to view the showcase — student project for System Analysis &amp; Design.</p>
+    <div class="gate-tabs">
+      <button type="button" class="gate-tab active" id="tabLogin">Log in</button>
+      <button type="button" class="gate-tab" id="tabSignup">Sign up</button>
+    </div>
+    <form id="loginForm" class="gate-form">
+      <div class="modal-field"><label for="loginUser">Admin ID</label><input type="text" id="loginUser" autocomplete="username" required></div>
+      <div class="modal-field"><label for="loginPass">Password</label><input type="password" id="loginPass" autocomplete="current-password" required></div>
+      <p class="modal-error" id="loginError"></p>
+      <button type="submit" class="modal-submit">Log in</button>
+    </form>
+    <form id="signupForm" class="gate-form" style="display:none;">
+      <div class="modal-field"><label for="signupUser">Choose an admin ID</label><input type="text" id="signupUser" autocomplete="username" required></div>
+      <div class="modal-field"><label for="signupPass">Choose a password</label><input type="password" id="signupPass" autocomplete="new-password" required></div>
+      <div class="modal-field"><label for="signupConfirm">Confirm password</label><input type="password" id="signupConfirm" autocomplete="new-password" required></div>
+      <p class="modal-error" id="signupError"></p>
+      <button type="submit" class="modal-submit">Sign up</button>
+    </form>
+    <p class="modal-note">Demo accounts only, held in memory for this visit — nothing is sent to a server. Default: <span class="mono">echinhttps / 062527</span></p>
+  </div>
+</div>
+
+<header>
+  <div class="brand-row">
+    <div class="wordmark">Vey<span>ro</span></div>
+    <span class="by mono">by chinhttps</span>
+    <span class="spin3d-wrap"><span class="spin3d">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 40 L60 8 L92 30 L40 62 Z" stroke="#B8451E" stroke-width="6" fill="#F7F6F0"/>
+        <circle cx="46" cy="30" r="8" fill="#EFEEE6" stroke="#B8451E" stroke-width="5"/>
+      </svg>
+    </span></span>
+  </div>
+  <nav class="mono">
+    <span>Smart finds, everyday essentials</span>
+    <button class="cart-btn" id="cartToggle" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1"/><circle cx="18" cy="21" r="1"/></svg>
+      Cart
+      <span class="cart-badge mono" id="cartBadge">0</span>
+    </button>
+  </nav>
+</header>
+
+<div class="admin-bar mono" id="adminBar">
+  <span>● SIGNED IN — <span id="currentUser">echinhttps</span></span>
+  <span><span id="statProducts">0</span> products · <span id="statStock">0</span> in stock</span>
+  <button id="adminLogout" class="admin-btn" type="button">Log out</button>
+</div>
+
+<section class="hero">
+  <div class="hero-tag" aria-hidden="true">
+    <svg viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 40 L60 8 L152 60 L100 92 Z" stroke="#17170F" stroke-width="2" fill="#F7F6F0"/>
+      <circle cx="52" cy="26" r="7" fill="#EFEEE6" stroke="#17170F" stroke-width="2"/>
+      <line x1="100" y1="92" x2="140" y2="6" stroke="#B8451E" stroke-width="1.5" stroke-dasharray="3 3"/>
+    </svg>
+  </div>
+  <span class="eyebrow mono"><span class="dot"></span>Tag 001 — Now shortlisting</span>
+  <h1>Smart finds for <em>everyday</em> essentials.</h1>
+  <p class="hero-sub">We tag, test, and shortlist the everyday goods worth your cart — so you spend less time digging through clutter and more time using things that actually work.</p>
+  <div class="hero-actions">
+    <a href="#merch" class="btn">Shop the drop ↓</a>
+    <a href="#features" class="btn-secondary">How we tag items</a>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="section-head">
+    <h2>What's on every tag</h2>
+    <p>Six things we check before anything earns a spot in the Veyro shortlist. Click a tag for the details.</p>
+  </div>
+  <div class="tag-grid">
+
+    <div class="tag-card" data-tag="01" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;01</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><line x1="20" y1="20" x2="14.6" y2="14.6"/></svg></div>
+      <h3>Curated shortlist</h3>
+      <p>Every item earns its spot after real-world testing, not because it's trending.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+    <div class="tag-card" data-tag="02" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;02</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v5h5"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div>
+      <h3>Plain-language specs</h3>
+      <p>Know exactly what you're buying, written in words that make sense — not marketing spin.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+    <div class="tag-card" data-tag="03" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;03</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 8-9"/><path d="M15 6h5v5"/></svg></div>
+      <h3>Price watch</h3>
+      <p>We track price history so "on sale" actually means something when you see it.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+    <div class="tag-card" data-tag="04" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;04</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="1.6"/><circle cx="17.5" cy="19" r="1.6"/></svg></div>
+      <h3>Fast, tracked shipping</h3>
+      <p>Every order ships with tracking, from checkout to your doorstep.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+    <div class="tag-card" data-tag="05" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;05</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></div>
+      <h3>30-day easy returns</h3>
+      <p>Changed your mind? Send it back — no interrogation, no fine print.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+    <div class="tag-card" data-tag="06" role="button" tabindex="0">
+      <div class="tag-hole"></div><span class="tag-code mono">TAG&nbsp;06</span>
+      <div class="tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+      <h3>Restock alerts</h3>
+      <p>Get notified the moment a sold-out favorite comes back in stock.</p>
+      <span class="tag-open mono">View details →</span>
+    </div>
+
+  </div>
+</section>
+
+<section class="merch" id="merch">
+  <div class="section-head">
+    <h2>The merch drop</h2>
+    <p>First run of Veyro gear, five colorways per piece. Add to cart and check out below.</p>
+  </div>
+
+  <div class="merch-category">
+    <div class="category-head"><h3>Hoodies</h3><span class="mono">5 pcs each</span></div>
+    <div class="merch-grid" id="grid-hoodie"></div>
+  </div>
+
+  <div class="merch-category">
+    <div class="category-head"><h3>Caps</h3><span class="mono">5 pcs each</span></div>
+    <div class="merch-grid" id="grid-cap"></div>
+  </div>
+
+  <div class="merch-category">
+    <div class="category-head"><h3>Vintage Tees</h3><span class="mono">5 pcs each</span></div>
+    <div class="merch-grid" id="grid-tee"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="brand-row">
+    <div class="wordmark">Vey<span>ro</span></div>
+    <span class="by mono">by chinhttps</span>
+    <span class="spin3d-wrap"><span class="spin3d">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="20" y="20" width="60" height="60" rx="6" stroke="#B8451E" stroke-width="6" fill="#F7F6F0"/>
+        <line x1="20" y1="50" x2="80" y2="50" stroke="#B8451E" stroke-width="4"/>
+      </svg>
+    </span></span>
+  </div>
+  <span class="mono">© 2026 VEYRO — STUDENT PROJECT, SYSTEM ANALYSIS &amp; DESIGN</span>
+</footer>
+
+<!-- TAG DETAIL MODAL -->
+<div class="modal-overlay" id="tagModal">
+  <div class="modal-box tag-modal-box">
+    <button class="modal-close" id="tagModalClose" type="button" aria-label="Close">&times;</button>
+    <span class="tag-modal-code mono" id="tagModalCode">TAG 01</span>
+    <h3 id="tagModalTitle">Title</h3>
+    <p class="tag-modal-desc" id="tagModalDesc">Description</p>
+    <p class="tag-modal-label mono" id="tagModalOptionsLabel">Options</p>
+    <div class="tag-option-list" id="tagModalOptions"></div>
+    <button class="modal-submit" id="tagModalDone" type="button">Got it</button>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="productDetailModal">
+  <div class="modal-box detail-box">
+    <button class="modal-close" id="detailClose" type="button" aria-label="Close">&times;</button>
+    <div class="detail-image" id="detailImage"></div>
+    <div class="detail-swatches" id="detailSwatches"></div>
+    <span class="tag-modal-code mono" id="detailBadge">HOODIE</span>
+    <h3 id="detailTitle">Product</h3>
+    <div class="product-rating" id="detailRating"></div>
+    <p class="product-price" id="detailPrice" style="font-size:1.1rem; margin-bottom:12px;"></p>
+    <p class="tag-modal-desc" id="detailDesc"></p>
+    <table class="detail-size-table">
+      <thead><tr><th>Size</th><th>S</th><th>M</th><th>L</th><th>XL</th></tr></thead>
+      <tbody><tr><th>In stock</th><td>✓</td><td>✓</td><td>✓</td><td id="detailXL">✓</td></tr></tbody>
+    </table>
+    <div class="qty-stepper" id="detailQtyStepper" style="margin-bottom:14px;">
+      <button class="qty-btn" type="button" data-step="-1">−</button>
+      <span class="qty-val mono" id="detailQtyVal">1</span>
+      <button class="qty-btn" type="button" data-step="1">+</button>
+    </div>
+    <div class="product-actions-row">
+      <button class="btn-cart" id="detailAddCart" type="button">Add to cart</button>
+      <button class="btn-buy" id="detailBuyNow" type="button">Buy now</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay">
+  <div class="cart-drawer">
+    <div class="cart-head">
+      <h3>Your cart</h3>
+      <button class="modal-close" id="cartClose" type="button" style="position:static;" aria-label="Close">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems"><p class="cart-empty">Your cart is empty.</p></div>
+    <div class="cart-foot">
+      <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">₱0</strong></div>
+      <button class="modal-submit" id="cartCheckoutBtn" type="button">Proceed to checkout</button>
+      <button class="modal-submit ghost" id="cartContinue" type="button">Continue shopping</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal-box checkout-box">
+    <button class="modal-close" id="checkoutClose" type="button" aria-label="Close">&times;</button>
+
+    <div id="checkoutStepAddress">
+      <div class="checkout-steps"><span class="active"></span><span></span><span></span></div>
+      <h3>Shipping address</h3>
+      <p class="modal-sub">Where should this demo order ship?</p>
+      <form id="addressForm">
+        <div class="modal-field"><label for="shipName">Full name</label><input type="text" id="shipName" required></div>
+        <div class="modal-field"><label for="shipPhone">Phone number</label><input type="tel" id="shipPhone" placeholder="09XX XXX XXXX" required></div>
+        <div class="modal-field"><label for="shipAddress">Address</label><input type="text" id="shipAddress" placeholder="House/unit no., street, barangay" required></div>
+        <div class="modal-row">
+          <div class="modal-field"><label for="shipCity">City / municipality</label><input type="text" id="shipCity" required></div>
+          <div class="modal-field"><label for="shipZip">Postal code</label><input type="text" id="shipZip" required></div>
+        </div>
+        <p class="modal-error" id="addressError"></p>
+        <button type="submit" class="modal-submit">Continue to payment</button>
+      </form>
+    </div>
+
+    <div id="checkoutStepPayment" style="display:none;">
+      <div class="checkout-steps"><span class="active"></span><span class="active"></span><span></span></div>
+      <h3>Payment method</h3>
+      <p class="modal-sub">Choose how you'd pay for this demo order.</p>
+
+      <div class="pay-option selected" data-pay="gcash">
+        <span class="dot-ring"></span>
+        <span><span class="pay-label">GCash</span><span class="pay-sub">Pay via GCash mobile wallet</span></span>
+      </div>
+      <div class="pay-fields active" id="fields-gcash">
+        <div class="modal-field"><label for="gcashNumber">GCash mobile number</label><input type="tel" id="gcashNumber" placeholder="09XX XXX XXXX"></div>
+      </div>
+
+      <div class="pay-option" data-pay="bank">
+        <span class="dot-ring"></span>
+        <span><span class="pay-label">Online banking</span><span class="pay-sub">BDO, BPI, Metrobank, UnionBank, Landbank</span></span>
+      </div>
+      <div class="pay-fields" id="fields-bank">
+        <div class="modal-field"><label for="bankSelect">Bank</label>
+          <select id="bankSelect">
+            <option value="BDO">BDO</option>
+            <option value="BPI">BPI</option>
+            <option value="Metrobank">Metrobank</option>
+            <option value="UnionBank">UnionBank</option>
+            <option value="Landbank">Landbank</option>
+          </select>
+        </div>
+        <div class="modal-field"><label for="bankAccountName">Account name</label><input type="text" id="bankAccountName"></div>
+      </div>
+
+      <div class="pay-option" data-pay="cod">
+        <span class="dot-ring"></span>
+        <span><span class="pay-label">Cash on delivery</span><span class="pay-sub">Pay in cash when your order arrives</span></span>
+      </div>
+
+      <div class="order-summary" id="orderSummary"></div>
+      <p class="modal-error" id="paymentError"></p>
+      <button type="button" class="modal-submit" id="placeOrderBtn">Place order</button>
+      <button type="button" class="modal-submit ghost" id="backToAddress">Back</button>
+    </div>
+
+    <div id="checkoutStepConfirm" style="display:none;">
+      <div class="confirm-box">
+        <div class="confirm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l2.5 2.5L16 9"/></svg></div>
+        <h3>Order placed!</h3>
+        <p class="confirm-order-no mono" id="confirmOrderNo">VEY-000000</p>
+        <div class="order-summary" id="confirmSummary"></div>
+        <p class="modal-note">This is a demo checkout for a student System Analysis &amp; Design project. No real payment was processed and nothing will be shipped.</p>
+        <button type="button" class="modal-submit" id="confirmDone" style="margin-top:14px;">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ---------- PRODUCT DATA ---------- */
+  function hoodieSVG(color){
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="90" rx="34" ry="6" fill="#17170F" opacity="0.08"/><path d="M32 16c4-6 8-8 18-8s14 2 18 8l14 10-8 12-8-5v45a3 3 0 0 1-3 3H37a3 3 0 0 1-3-3V33l-8 5-8-12z" fill="' + color + '" stroke="#17170F" stroke-width="1.6" stroke-linejoin="round"/><path d="M40 16a10 10 0 0 0 20 0" fill="none" stroke="#17170F" stroke-width="1.6"/><line x1="46" y1="40" x2="46" y2="58" stroke="#17170F" stroke-width="1.6"/><line x1="54" y1="40" x2="54" y2="58" stroke="#17170F" stroke-width="1.6"/></svg>';
+  }
+  function capSVG(color){
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="80" rx="30" ry="5" fill="#17170F" opacity="0.08"/><path d="M18 62c0-20 14-34 32-34s32 14 32 34" fill="' + color + '" stroke="#17170F" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 62c-4 1-6 3-6 6s10 6 38 6 38-3 38-6-2-5-6-6" fill="' + color + '" stroke="#17170F" stroke-width="1.6" stroke-linejoin="round"/><path d="M50 28v-8" stroke="#17170F" stroke-width="1.6"/><circle cx="50" cy="18" r="3" fill="' + color + '" stroke="#17170F" stroke-width="1.6"/></svg>';
+  }
+  function teeSVG(color){
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="90" rx="30" ry="5" fill="#17170F" opacity="0.08"/><path d="M34 18 18 30l8 12 8-6v46h32V36l8 6 8-12-16-12" fill="' + color + '" stroke="#17170F" stroke-width="1.6" stroke-linejoin="round"/><path d="M34 18c4 6 10 9 16 9s12-3 16-9" fill="none" stroke="#17170F" stroke-width="1.6"/><line x1="40" y1="52" x2="60" y2="70" stroke="#17170F" stroke-width="1.4" stroke-dasharray="2 3"/><line x1="60" y1="52" x2="40" y2="70" stroke="#17170F" stroke-width="1.4" stroke-dasharray="2 3"/></svg>';
+  }
+
+  const products = [
+    { id:'h1', cat:'hoodie', name:'Veyro Hoodie', colorway:'Charcoal', hex:'#3B3B36', price:1290, rating:4.7, reviews:38, desc:'Heavyweight pullover hoodie with an embroidered hang-tag logo and a fleece-lined hood.', img:hoodieSVG },
+    { id:'h2', cat:'hoodie', name:'Veyro Hoodie', colorway:'Stone Grey', hex:'#B9B6A8', price:1290, rating:4.6, reviews:22, desc:'Heavyweight pullover hoodie with an embroidered hang-tag logo and a fleece-lined hood.', img:hoodieSVG },
+    { id:'h3', cat:'hoodie', name:'Veyro Hoodie', colorway:'Rust', hex:'#B8451E', price:1390, rating:4.9, reviews:51, desc:'Heavyweight pullover hoodie in a limited rust colorway, embroidered hang-tag logo.', img:hoodieSVG },
+    { id:'h4', cat:'hoodie', name:'Veyro Hoodie', colorway:'Olive', hex:'#5C6B47', price:1290, rating:4.5, reviews:17, desc:'Heavyweight pullover hoodie with an embroidered hang-tag logo and a fleece-lined hood.', img:hoodieSVG },
+    { id:'h5', cat:'hoodie', name:'Veyro Hoodie', colorway:'Black', hex:'#17170F', price:1290, rating:4.8, reviews:64, desc:'Heavyweight pullover hoodie with an embroidered hang-tag logo and a fleece-lined hood.', img:hoodieSVG },
+
+    { id:'c1', cat:'cap', name:'Veyro Cap', colorway:'Classic Black', hex:'#17170F', price:650, rating:4.6, reviews:29, desc:'Structured 6-panel cap with a curved brim and an adjustable strap.', img:capSVG },
+    { id:'c2', cat:'cap', name:'Veyro Cap', colorway:'Stone', hex:'#B9B6A8', price:650, rating:4.4, reviews:14, desc:'Structured 6-panel cap with a curved brim and an adjustable strap.', img:capSVG },
+    { id:'c3', cat:'cap', name:'Veyro Cap', colorway:'Rust', hex:'#B8451E', price:690, rating:4.8, reviews:33, desc:'Structured 6-panel cap in a limited rust colorway, curved brim.', img:capSVG },
+    { id:'c4', cat:'cap', name:'Veyro Cap', colorway:'Navy', hex:'#2C3A52', price:650, rating:4.5, reviews:19, desc:'Structured 6-panel cap with a curved brim and an adjustable strap.', img:capSVG },
+    { id:'c5', cat:'cap', name:'Veyro Cap', colorway:'Olive', hex:'#5C6B47', price:650, rating:4.3, reviews:11, desc:'Structured 6-panel cap with a curved brim and an adjustable strap.', img:capSVG },
+
+    { id:'t1', cat:'tee', name:'Vintage Tee', colorway:'Washed White', hex:'#E8E5DA', price:590, rating:4.6, reviews:41, desc:'Garment-washed graphic tee with a cracked-print Veyro mark.', img:teeSVG },
+    { id:'t2', cat:'tee', name:'Vintage Tee', colorway:'Faded Black', hex:'#3B3B36', price:590, rating:4.7, reviews:47, desc:'Garment-washed graphic tee with a cracked-print Veyro mark.', img:teeSVG },
+    { id:'t3', cat:'tee', name:'Vintage Tee', colorway:'Rust Wash', hex:'#B8451E', price:650, rating:4.9, reviews:58, desc:'Garment-washed graphic tee in a limited rust wash, cracked-print mark.', img:teeSVG },
+    { id:'t4', cat:'tee', name:'Vintage Tee', colorway:'Sage', hex:'#7C8A6A', price:590, rating:4.4, reviews:16, desc:'Garment-washed graphic tee with a cracked-print Veyro mark.', img:teeSVG },
+    { id:'t5', cat:'tee', name:'Vintage Tee', colorway:'Stone', hex:'#B9B6A8', price:590, rating:4.5, reviews:20, desc:'Garment-washed graphic tee with a cracked-print Veyro mark.', img:teeSVG }
+  ];
+
+  const qtyState = {};
+  products.forEach(p => qtyState[p.id] = 1);
+
+  function peso(n){ return '₱' + n.toLocaleString('en-PH'); }
+
+  function starString(rating){
+    const full = Math.round(rating);
+    return '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+
+  /* ---------- RENDER PRODUCT CARDS ---------- */
+  function renderProducts(){
+    ['hoodie','cap','tee'].forEach(cat => {
+      const grid = document.getElementById('grid-' + cat);
+      grid.innerHTML = '';
+      products.filter(p => p.cat === cat).forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML =
+          '<span class="product-badge mono">In stock</span>' +
+          '<div class="product-image" data-open-detail="' + p.id + '">' + p.img(p.hex) + '</div>' +
+          '<div class="product-info"><h3 data-open-detail="' + p.id + '">' + p.name + '</h3><span class="product-price mono">' + peso(p.price) + '</span></div>' +
+          '<span class="colorway"><i class="swatch" style="background:' + p.hex + '"></i>' + p.colorway + '</span>' +
+          '<div class="product-rating">' + starString(p.rating) + ' <span class="count">' + p.rating + ' (' + p.reviews + ')</span></div>' +
+          '<p class="product-desc">' + p.desc + '</p>' +
+          '<span class="product-stock mono">5 pcs available</span>' +
+          '<div class="qty-stepper" data-qty-for="' + p.id + '">' +
+            '<button class="qty-btn" type="button" data-step="-1">−</button>' +
+            '<span class="qty-val mono">1</span>' +
+            '<button class="qty-btn" type="button" data-step="1">+</button>' +
+          '</div>' +
+          '<div class="product-actions">' +
+            '<div class="product-actions-row">' +
+              '<button class="btn-cart" data-add-cart="' + p.id + '" type="button">Add to cart</button>' +
+              '<button class="btn-buy" data-buy-now="' + p.id + '" type="button">Buy now</button>' +
+            '</div>' +
+            '<button class="btn-details" data-open-detail="' + p.id + '" type="button">View details</button>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+    });
+
+    // Qty steppers
+    document.querySelectorAll('[data-qty-for]').forEach(stepper => {
+      const id = stepper.getAttribute('data-qty-for');
+      stepper.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const step = parseInt(btn.dataset.step, 10);
+          qtyState[id] = Math.min(5, Math.max(1, qtyState[id] + step));
+          stepper.querySelector('.qty-val').textContent = qtyState[id];
+        });
+      });
+    });
+
+    // Add to cart / Buy now / details
+    document.querySelectorAll('[data-add-cart]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addToCart(btn.getAttribute('data-add-cart'), qtyState[btn.getAttribute('data-add-cart')]);
+        showToast('Added to cart.');
+      });
+    });
+    document.querySelectorAll('[data-buy-now]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        addToCart(btn.getAttribute('data-buy-now'), qtyState[btn.getAttribute('data-buy-now')]);
+        openCheckout();
+      });
+    });
+    document.querySelectorAll('[data-open-detail]').forEach(el => {
+      el.addEventListener('click', () => openDetail(el.getAttribute('data-open-detail')));
+    });
+
+    document.querySelectorAll('.product-card').forEach(el => attachTilt(el, 8));
+  }
+
+  /* ---------- CART ---------- */
+  let cart = []; // {id, qty}
+
+  function addToCart(id, qty){
+    const existing = cart.find(c => c.id === id);
+    if(existing){ existing.qty = Math.min(5, existing.qty + qty); }
+    else { cart.push({ id: id, qty: qty }); }
+    renderCart();
+  }
+  function removeFromCart(id){
+    cart = cart.filter(c => c.id !== id);
+    renderCart();
+  }
+  function cartTotal(){
+    return cart.reduce((sum, c) => {
+      const p = products.find(x => x.id === c.id);
+      return sum + (p ? p.price * c.qty : 0);
+    }, 0);
+  }
+  function cartCount(){ return cart.reduce((n,c) => n + c.qty, 0); }
+
+  function renderCart(){
+    document.getElementById('cartBadge').textContent = cartCount();
+    const wrap = document.getElementById('cartItems');
+    if(cart.length === 0){
+      wrap.innerHTML = '<p class="cart-empty">Your cart is empty.</p>';
+    } else {
+      wrap.innerHTML = cart.map(c => {
+        const p = products.find(x => x.id === c.id);
+        if(!p) return '';
+        return '<div class="cart-item">' +
+          '<div class="cart-item-img">' + p.img(p.hex) + '</div>' +
+          '<div class="cart-item-info">' +
+            '<h4>' + p.name + '</h4>' +
+            '<span class="colorway"><i class="swatch" style="background:' + p.hex + '"></i>' + p.colorway + ' · Qty ' + c.qty + '</span>' +
+            '<div class="cart-item-controls">' +
+              '<span class="cart-item-price mono">' + peso(p.price * c.qty) + '</span>' +
+              '<button class="cart-item-remove" data-remove="' + p.id + '" type="button">Remove</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      wrap.querySelectorAll('[data-remove]').forEach(btn => {
+        btn.addEventListener('click', () => removeFromCart(btn.getAttribute('data-remove')));
+      });
+    }
+    document.getElementById('cartSubtotal').textContent = peso(cartTotal());
+  }
+
+  const cartOverlay = document.getElementById('cartOverlay');
+  document.getElementById('cartToggle').addEventListener('click', () => cartOverlay.classList.add('open'));
+  document.getElementById('cartClose').addEventListener('click', () => cartOverlay.classList.remove('open'));
+  document.getElementById('cartContinue').addEventListener('click', () => cartOverlay.classList.remove('open'));
+  cartOverlay.addEventListener('click', (e) => { if(e.target === cartOverlay) cartOverlay.classList.remove('open'); });
+  document.getElementById('cartCheckoutBtn').addEventListener('click', () => {
+    if(cart.length === 0){ showToast('Your cart is empty.'); return; }
+    cartOverlay.classList.remove('open');
+    openCheckout();
+  });
+
+  /* ---------- PRODUCT DETAIL MODAL ---------- */
+  const detailModal = document.getElementById('productDetailModal');
+  let detailProductId = null;
+  let detailQty = 1;
+
+  function openDetail(id){
+    const p = products.find(x => x.id === id);
+    if(!p) return;
+    detailProductId = id;
+    detailQty = 1;
+    document.getElementById('detailQtyVal').textContent = 1;
+    document.getElementById('detailImage').innerHTML = p.img(p.hex);
+    document.getElementById('detailBadge').textContent = p.cat.toUpperCase();
+    document.getElementById('detailTitle').textContent = p.name + ' — ' + p.colorway;
+    document.getElementById('detailRating').innerHTML = starString(p.rating) + ' <span class="count">' + p.rating + ' (' + p.reviews + ' reviews)</span>';
+    document.getElementById('detailPrice').textContent = peso(p.price);
+    document.getElementById('detailDesc').textContent = p.desc;
+    document.getElementById('detailXL').textContent = p.cat === 'cap' ? '—' : '✓';
+
+    const swatchWrap = document.getElementById('detailSwatches');
+    swatchWrap.innerHTML = '';
+    products.filter(x => x.cat === p.cat && x.name === p.name).forEach(variant => {
+      const sw = document.createElement('button');
+      sw.type = 'button';
+      sw.className = 'detail-swatch' + (variant.id === id ? ' active' : '');
+      sw.style.background = variant.hex;
+      sw.title = variant.colorway;
+      sw.addEventListener('click', () => openDetail(variant.id));
+      swatchWrap.appendChild(sw);
+    });
+
+    detailModal.classList.add('open');
+  }
+  document.getElementById('detailClose').addEventListener('click', () => detailModal.classList.remove('open'));
+  detailModal.addEventListener('click', (e) => { if(e.target === detailModal) detailModal.classList.remove('open'); });
+  document.getElementById('detailQtyStepper').querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      detailQty = Math.min(5, Math.max(1, detailQty + parseInt(btn.dataset.step, 10)));
+      document.getElementById('detailQtyVal').textContent = detailQty;
+    });
+  });
+  document.getElementById('detailAddCart').addEventListener('click', () => {
+    addToCart(detailProductId, detailQty);
+    showToast('Added to cart.');
+    detailModal.classList.remove('open');
+  });
+  document.getElementById('detailBuyNow').addEventListener('click', () => {
+    addToCart(detailProductId, detailQty);
+    detailModal.classList.remove('open');
+    openCheckout();
+  });
+
+  /* ---------- CHECKOUT ---------- */
+  const checkoutModal = document.getElementById('checkoutModal');
+  const stepAddress = document.getElementById('checkoutStepAddress');
+  const stepPayment = document.getElementById('checkoutStepPayment');
+  const stepConfirm = document.getElementById('checkoutStepConfirm');
+  let selectedPay = 'gcash';
+
+  function openCheckout(){
+    if(cart.length === 0){ showToast('Your cart is empty.'); return; }
+    stepAddress.style.display = '';
+    stepPayment.style.display = 'none';
+    stepConfirm.style.display = 'none';
+    checkoutModal.classList.add('open');
+  }
+  document.getElementById('checkoutClose').addEventListener('click', () => checkoutModal.classList.remove('open'));
+  checkoutModal.addEventListener('click', (e) => { if(e.target === checkoutModal) checkoutModal.classList.remove('open'); });
+
+  document.getElementById('addressForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    stepAddress.style.display = 'none';
+    stepPayment.style.display = '';
+    buildOrderSummary();
+  });
+  document.getElementById('backToAddress').addEventListener('click', () => {
+    stepPayment.style.display = 'none';
+    stepAddress.style.display = '';
+  });
+
+  document.querySelectorAll('.pay-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.pay-option').forEach(o => o.classList.remove('selected'));
+      document.querySelectorAll('.pay-fields').forEach(f => f.classList.remove('active'));
+      opt.classList.add('selected');
+      selectedPay = opt.getAttribute('data-pay');
+      const fields = document.getElementById('fields-' + selectedPay);
+      if(fields) fields.classList.add('active');
+    });
+  });
+
+  function buildOrderSummary(){
+    const rows = cart.map(c => {
+      const p = products.find(x => x.id === c.id);
+      return '<div class="order-summary-row"><span>' + p.name + ' (' + p.colorway + ') × ' + c.qty + '</span><span>' + peso(p.price * c.qty) + '</span></div>';
+    }).join('');
+    document.getElementById('orderSummary').innerHTML = rows + '<div class="order-summary-row total"><span>Total</span><span>' + peso(cartTotal()) + '</span></div>';
+  }
+
+  document.getElementById('placeOrderBtn').addEventListener('click', () => {
+    const errEl = document.getElementById('paymentError');
+    if(selectedPay === 'gcash'){
+      const num = document.getElementById('gcashNumber').value.trim();
+      if(num.length < 10){ errEl.textContent = 'Enter a valid GCash mobile number.'; return; }
+    } else if(selectedPay === 'bank'){
+      const acc = document.getElementById('bankAccountName').value.trim();
+      if(!acc){ errEl.textContent = 'Enter the account name for online banking.'; return; }
+    }
+    errEl.textContent = '';
+
+    const orderNo = 'VEY-' + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById('confirmOrderNo').textContent = orderNo;
+    const payLabel = selectedPay === 'gcash' ? 'GCash' : (selectedPay === 'bank' ? 'Online banking — ' + document.getElementById('bankSelect').value : 'Cash on delivery');
+    const rows = cart.map(c => {
+      const p = products.find(x => x.id === c.id);
+      return '<div class="order-summary-row"><span>' + p.name + ' (' + p.colorway + ') × ' + c.qty + '</span><span>' + peso(p.price * c.qty) + '</span></div>';
+    }).join('');
+    document.getElementById('confirmSummary').innerHTML = rows +
+      '<div class="order-summary-row"><span>Payment</span><span>' + payLabel + '</span></div>' +
+      '<div class="order-summary-row"><span>Ship to</span><span>' + document.getElementById('shipCity').value + '</span></div>' +
+      '<div class="order-summary-row total"><span>Total</span><span>' + peso(cartTotal()) + '</span></div>';
+
+    stepPayment.style.display = 'none';
+    stepConfirm.style.display = '';
+  });
+
+  document.getElementById('confirmDone').addEventListener('click', () => {
+    cart = [];
+    renderCart();
+    checkoutModal.classList.remove('open');
+    document.getElementById('addressForm').reset();
+    showToast('Thanks for your demo order!');
+  });
+
+  /* ---------- TOAST ---------- */
+  function showToast(msg){
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(()=> t.classList.add('show'));
+    setTimeout(()=>{
+      t.classList.remove('show');
+      setTimeout(()=> t.remove(), 300);
+    }, 2400);
+  }
+
+  /* ---------- SITE GATE (login / signup) ---------- */
+  const accounts = [ { user: "echinhttps", pass: "062527" } ];
+  const gate = document.getElementById('gateOverlay');
+  const body = document.body;
+  const adminLogoutBtn = document.getElementById('adminLogout');
+  const currentUserEl = document.getElementById('currentUser');
+  const tabLogin = document.getElementById('tabLogin');
+  const tabSignup = document.getElementById('tabSignup');
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const loginError = document.getElementById('loginError');
+  const signupError = document.getElementById('signupError');
+  const gateBox = document.querySelector('.gate-box');
+
+  function shakeGate(){ gateBox.classList.remove('shake'); void gateBox.offsetWidth; gateBox.classList.add('shake'); }
+
+  function switchTab(tab){
+    const showLogin = tab === 'login';
+    tabLogin.classList.toggle('active', showLogin);
+    tabSignup.classList.toggle('active', !showLogin);
+    loginForm.style.display = showLogin ? '' : 'none';
+    signupForm.style.display = showLogin ? 'none' : '';
+    loginError.textContent = '';
+    signupError.textContent = '';
+  }
+  tabLogin.addEventListener('click', () => switchTab('login'));
+  tabSignup.addEventListener('click', () => switchTab('signup'));
+
+  function updateAdminStats(){
+    document.getElementById('statProducts').textContent = products.length;
+    document.getElementById('statStock').textContent = (products.length * 5) + ' pcs';
+  }
+
+  function grantAccess(user, message){
+    gate.classList.add('gate-hidden');
+    body.classList.remove('gate-open');
+    body.classList.add('admin-active');
+    currentUserEl.textContent = user;
+    updateAdminStats();
+    showToast(message);
+  }
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    const match = accounts.find(a => a.user === user && a.pass === pass);
+    if(match){ loginForm.reset(); grantAccess(match.user, 'Login successful — welcome back, ' + match.user + '.'); }
+    else { loginError.textContent = 'Incorrect admin ID or password.'; shakeGate(); }
+  });
+
+  signupForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const user = document.getElementById('signupUser').value.trim();
+    const pass = document.getElementById('signupPass').value;
+    const confirmPass = document.getElementById('signupConfirm').value;
+    if(!user || !pass){ signupError.textContent = 'Fill in an admin ID and password.'; shakeGate(); return; }
+    if(accounts.some(a => a.user === user)){ signupError.textContent = 'That admin ID is already taken.'; shakeGate(); return; }
+    if(pass !== confirmPass){ signupError.textContent = "Passwords don't match."; shakeGate(); return; }
+    accounts.push({ user: user, pass: pass });
+    signupForm.reset();
+    grantAccess(user, 'Account created — welcome, ' + user + '.');
+  });
+
+  adminLogoutBtn.addEventListener('click', function(){
+    body.classList.remove('admin-active');
+    body.classList.add('gate-open');
+    gate.classList.remove('gate-hidden');
+    switchTab('login');
+    showToast('Logged out.');
+  });
+
+  /* ---------- FEATURE TAG DETAIL MODAL ---------- */
+  const tagData = {
+    "01": { code:"TAG 01", title:"Curated shortlist", desc:"Every item earns its spot after real-world testing, not because it's trending. Here's how you can sort the shortlist.", optionsLabel:"Sort shortlist by", options:["Most tested","Newest additions","Staff picks"] },
+    "02": { code:"TAG 02", title:"Plain-language specs", desc:"Know exactly what you're buying, written in words that make sense — not marketing spin. Choose how specs are shown to you.", optionsLabel:"Spec view format", options:["Plain summary","Full spec sheet","Side-by-side compare"] },
+    "03": { code:"TAG 03", title:"Price watch", desc:'We track price history so "on sale" actually means something when you see it. Pick when you want to hear about it.', optionsLabel:"Alert me when", options:["Price drops 10%+","Item hits lowest-ever price","Any price change"] },
+    "04": { code:"TAG 04", title:"Fast, tracked shipping", desc:"Every order ships with tracking, from checkout to your doorstep. Choose the speed that fits.", optionsLabel:"Shipping speed", options:["Standard (3–5 days)","Express (1–2 days)","Store pickup"] },
+    "05": { code:"TAG 05", title:"30-day easy returns", desc:"Changed your mind? Send it back — no interrogation, no fine print. Tell us why and we'll pre-fill the label.", optionsLabel:"Return reason", options:["Changed my mind","Wrong size or fit","Item issue / damaged"] },
+    "06": { code:"TAG 06", title:"Restock alerts", desc:"Get notified the moment a sold-out favorite comes back in stock. Pick how you'd like to hear first.", optionsLabel:"Notify me via", options:["Email","SMS","Push notification"] }
+  };
+  const tagModal = document.getElementById('tagModal');
+  function openTagModal(id){
+    const data = tagData[id];
+    if(!data) return;
+    document.getElementById('tagModalCode').textContent = data.code;
+    document.getElementById('tagModalTitle').textContent = data.title;
+    document.getElementById('tagModalDesc').textContent = data.desc;
+    document.getElementById('tagModalOptionsLabel').textContent = data.optionsLabel;
+    const optWrap = document.getElementById('tagModalOptions');
+    optWrap.innerHTML = '';
+    data.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tag-option' + (i === 0 ? ' selected' : '');
+      btn.innerHTML = '<span class="dot-ring"></span><span>' + opt + '</span>';
+      btn.addEventListener('click', () => {
+        optWrap.querySelectorAll('.tag-option').forEach(o => o.classList.remove('selected'));
+        btn.classList.add('selected');
+        showToast(opt + ' selected.');
+      });
+      optWrap.appendChild(btn);
+    });
+    tagModal.classList.add('open');
+  }
+  document.getElementById('tagModalClose').addEventListener('click', () => tagModal.classList.remove('open'));
+  document.getElementById('tagModalDone').addEventListener('click', () => tagModal.classList.remove('open'));
+  tagModal.addEventListener('click', (e) => { if(e.target === tagModal) tagModal.classList.remove('open'); });
+  document.querySelectorAll('.tag-card').forEach(card => {
+    card.addEventListener('click', () => openTagModal(card.dataset.tag));
+    card.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openTagModal(card.dataset.tag); }
+    });
+  });
+
+  /* ---------- 3D TILT ---------- */
+  function attachTilt(el, max){
+    el.addEventListener('mousemove', function(e){
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = 'translateY(-3px) rotateX(' + (-y * max).toFixed(2) + 'deg) rotateY(' + (x * max).toFixed(2) + 'deg)';
+    });
+    el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+  }
+  document.querySelectorAll('.tag-card').forEach(el => attachTilt(el, 7));
+
+  /* ---------- SMOOTH SCROLL FEEDBACK ---------- */
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', () => {
+      showToast('Jumping to ' + link.getAttribute('href').replace('#','').replace('-', ' ') + '…');
+    });
+  });
+
+  renderProducts();
+  renderCart();
+})();
+</script>
+</body>
+</html>
